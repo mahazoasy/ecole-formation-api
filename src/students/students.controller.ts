@@ -13,7 +13,7 @@ export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Liste des étudiants (pagination + filtre nom)' })
+  @ApiOperation({ summary: 'Liste paginée des étudiants' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'per_page', required: false, type: Number })
   @ApiQuery({ name: 'name', required: false, type: String })
@@ -24,22 +24,20 @@ export class StudentsController {
 
   @Post()
   @ApiOperation({ summary: 'Créer un étudiant' })
-  @ApiResponse({ status: 201, description: 'Créé' })
+  @ApiResponse({ status: 201 })
   async create(@Body() createStudentDto: CreateStudentDto) {
     const data = await this.studentsService.create(createStudentDto);
     return { success: true, data, message: 'Étudiant créé' };
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Détail étudiant + ses enrollments' })
+  @ApiOperation({ summary: 'Détail étudiant + ses inscriptions' })
   async findOne(@Param('id') id: string) {
-    // Ajouter populate enrollments (à implémenter dans le service)
     const data = await this.studentsService.findOne(id);
     return { success: true, data };
   }
 
   @Put(':id')
-  @ApiOperation({ summary: 'Modifier un étudiant' })
   async update(@Param('id') id: string, @Body() updateStudentDto: UpdateStudentDto) {
     const data = await this.studentsService.update(id, updateStudentDto);
     return { success: true, data, message: 'Étudiant modifié' };
@@ -47,7 +45,6 @@ export class StudentsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Supprimer un étudiant' })
   async remove(@Param('id') id: string) {
     await this.studentsService.remove(id);
   }

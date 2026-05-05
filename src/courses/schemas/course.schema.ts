@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Instructor } from '../../instructors/schemas/instructor.schema';
 
 export type CourseDocument = Course & Document;
 
@@ -10,7 +9,7 @@ export class Course {
   title: string;
 
   @Prop()
-  description: string;   // sera remplie par OpenAI
+  description: string;
 
   @Prop({ required: true, min: 0 })
   price: number;

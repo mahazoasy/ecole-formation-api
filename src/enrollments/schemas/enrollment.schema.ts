@@ -1,7 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Student } from '../../students/schemas/student.schema';
-import { Course } from '../../courses/schemas/course.schema';
 
 export type EnrollmentDocument = Enrollment & Document;
 

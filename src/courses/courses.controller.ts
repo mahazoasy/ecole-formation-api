@@ -17,7 +17,7 @@ export class CoursesController {
   ) {}
 
   @Get()
-  @ApiOperation({ summary: 'Liste des cours (filtre instructor_id, tri price)' })
+  @ApiOperation({ summary: 'Liste des cours' })
   @ApiQuery({ name: 'instructor_id', required: false })
   @ApiQuery({ name: 'sort', required: false, enum: ['price'] })
   @ApiQuery({ name: 'direction', required: false, enum: ['asc', 'desc'] })
@@ -27,11 +27,17 @@ export class CoursesController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Détail cours + formateur + nb enrollments' })
+  @ApiOperation({ summary: 'Détail cours + formateur + nb inscriptions' })
   async findOne(@Param('id') id: string) {
     const course = await this.coursesService.findOne(id);
-    const enrollmentsCount = await this.coursesService.countEnrollments(id); // à implémenter
-    return { success: true, data: { ...course.toObject(), enrollments_count: enrollmentsCount } };
+    const enrollmentsCount = await this.coursesService.countEnrollments(id);
+    return {
+      success: true,
+      data: {
+        ...(course as any)._doc,
+        enrollments_count: enrollmentsCount,
+      },
+    };
   }
 
   @Post()
@@ -58,7 +64,6 @@ export class CoursesController {
     await this.coursesService.remove(id);
   }
 
-  // OpenAI endpoints
   @Post(':id/generate-description')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

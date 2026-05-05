@@ -9,7 +9,10 @@ export class EnrollmentsService {
   constructor(@InjectModel(Enrollment.name) private enrollmentModel: Model<EnrollmentDocument>) {}
 
   async create(createDto: CreateEnrollmentDto): Promise<Enrollment> {
-    const existing = await this.enrollmentModel.findOne({ student_id: new Types.ObjectId(createDto.student_id), course_id: new Types.ObjectId(createDto.course_id) }).exec();
+    const existing = await this.enrollmentModel.findOne({
+      student_id: new Types.ObjectId(createDto.student_id),
+      course_id: new Types.ObjectId(createDto.course_id),
+    }).exec();
     if (existing) throw new ConflictException('Étudiant déjà inscrit à ce cours');
     const enrollment = new this.enrollmentModel({
       ...createDto,
@@ -24,6 +27,12 @@ export class EnrollmentsService {
     if (status) filter.status = status;
     if (payment_status) filter.payment_status = payment_status;
     return this.enrollmentModel.find(filter).populate('student_id course_id').exec();
+  }
+
+  async findOne(id: string): Promise<Enrollment> {
+    const enrollment = await this.enrollmentModel.findById(id).exec();
+    if (!enrollment) throw new NotFoundException('Inscription non trouvée');
+    return enrollment;
   }
 
   async complete(id: string): Promise<Enrollment> {

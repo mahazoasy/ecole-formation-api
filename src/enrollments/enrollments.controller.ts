@@ -12,7 +12,6 @@ export class EnrollmentsController {
   constructor(private readonly enrollmentsService: EnrollmentsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Liste des inscriptions (filtres status, payment_status)' })
   @ApiQuery({ name: 'status', required: false })
   @ApiQuery({ name: 'payment_status', required: false })
   async findAll(@Query('status') status?: string, @Query('payment_status') payment_status?: string) {
@@ -21,8 +20,7 @@ export class EnrollmentsController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Inscrire un étudiant à un cours' })
-  @ApiResponse({ status: 201, description: 'Inscription créée' })
+  @ApiResponse({ status: 201 })
   @ApiResponse({ status: 409, description: 'Déjà inscrit' })
   async create(@Body() createEnrollmentDto: CreateEnrollmentDto) {
     const data = await this.enrollmentsService.create(createEnrollmentDto);
@@ -30,7 +28,6 @@ export class EnrollmentsController {
   }
 
   @Patch(':id/complete')
-  @ApiOperation({ summary: 'Passer le statut à completed' })
   async complete(@Param('id') id: string) {
     const data = await this.enrollmentsService.complete(id);
     return { success: true, data, message: 'Cours terminé' };

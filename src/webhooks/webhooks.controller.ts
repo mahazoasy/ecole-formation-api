@@ -18,7 +18,8 @@ export class WebhooksController {
     if (!signature) return { success: false, message: 'Signature manquante' };
 
     const secret = this.config.get('WEBHOOK_SECRET');
-    const expectedSignature = 'sha256=' + require('crypto').createHmac('sha256', secret).update(rawBody).digest('hex');
+    const crypto = require('crypto');
+    const expectedSignature = 'sha256=' + crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
     if (signature !== expectedSignature) {
       return { success: false, message: 'Signature invalide' };
     }

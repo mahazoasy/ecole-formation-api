@@ -5,17 +5,18 @@ import { Course, CourseDocument } from './schemas/course.schema';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
 import { Enrollment, EnrollmentDocument } from '../enrollments/schemas/enrollment.schema';
+import { Instructor, InstructorDocument } from '../instructors/schemas/instructor.schema';
 
 @Injectable()
 export class CoursesService {
   constructor(
     @InjectModel(Course.name) private courseModel: Model<CourseDocument>,
     @InjectModel(Enrollment.name) private enrollmentModel: Model<EnrollmentDocument>,
+    @InjectModel(Instructor.name) private instructorModel: Model<InstructorDocument>,
   ) {}
 
   async create(createDto: CreateCourseDto): Promise<Course> {
-    const newCourse = new this.courseModel(createDto);
-    return newCourse.save();
+    return new this.courseModel(createDto).save();
   }
 
   async findAll(instructor_id?: string, sortBy?: string, sortDir: 'asc' | 'desc' = 'asc'): Promise<Course[]> {
@@ -28,6 +29,16 @@ export class CoursesService {
     const course = await this.courseModel.findById(id).populate('instructor_id').exec();
     if (!course) throw new NotFoundException('Cours non trouvé');
     return course;
+  }
+
+  async countEnrollments(courseId: string): Promise<number> {
+    return this.enrollmentModel.countDocuments({ course_id: new Types.ObjectId(courseId) }).exec();
+  }
+
+  async getInstructor(instructorId: Types.ObjectId): Promise<Instructor> {
+    const instructor = await this.instructorModel.findById(instructorId).exec();
+    if (!instructor) throw new NotFoundException('Formateur non trouvé');
+    return instructor;
   }
 
   async update(id: string, updateDto: UpdateCourseDto): Promise<Course> {
@@ -46,6 +57,8 @@ export class CoursesService {
   }
 
   async updateDescription(id: string, description: string): Promise<Course> {
-    return this.courseModel.findByIdAndUpdate(id, { description }, { new: true }).exec();
+    const updated = await this.courseModel.findByIdAndUpdate(id, { description }, { new: true }).exec();
+    if (!updated) throw new NotFoundException('Cours non trouvé');
+    return updated;
   }
 }
