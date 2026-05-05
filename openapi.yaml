@@ -1,0 +1,410 @@
+openapi: 3.0.0
+paths:
+  /api/v1/auth/login:
+    post:
+      operationId: AuthController_login
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginDto"
+      responses:
+        "200":
+          description: Login réussi
+        "401":
+          description: Identifiants incorrects
+      summary: Connexion - retourne JWT
+      tags:
+        - Authentification
+  /api/v1/students:
+    get:
+      operationId: StudentsController_findAll
+      parameters:
+        - name: name
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: per_page
+          required: false
+          in: query
+          schema:
+            type: number
+        - name: page
+          required: false
+          in: query
+          schema:
+            type: number
+      responses:
+        "200":
+          description: ""
+      security: &a1
+        - bearer: []
+      summary: Liste paginée des étudiants
+      tags: &a2
+        - Students
+    post:
+      operationId: StudentsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStudentDto"
+      responses:
+        "201":
+          description: ""
+      security: *a1
+      summary: Créer un étudiant
+      tags: *a2
+  /api/v1/students/{id}:
+    get:
+      operationId: StudentsController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      security: *a1
+      summary: Détail étudiant + ses inscriptions
+      tags: *a2
+    put:
+      operationId: StudentsController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateStudentDto"
+      responses:
+        "200":
+          description: ""
+      security: *a1
+      tags: *a2
+    delete:
+      operationId: StudentsController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "204":
+          description: ""
+      security: *a1
+      tags: *a2
+  /api/v1/instructors:
+    get:
+      operationId: InstructorsController_findAll
+      parameters: []
+      responses:
+        "200":
+          description: ""
+      summary: Liste des formateurs
+      tags: &a3
+        - Instructors
+    post:
+      operationId: InstructorsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateInstructorDto"
+      responses:
+        "201":
+          description: ""
+      security:
+        - bearer: []
+      summary: Créer un formateur
+      tags: *a3
+  /api/v1/courses:
+    get:
+      operationId: CoursesController_findAll
+      parameters:
+        - name: instructor_id
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: sort
+          required: false
+          in: query
+          schema:
+            enum:
+              - price
+            type: string
+        - name: direction
+          required: false
+          in: query
+          schema:
+            enum:
+              - asc
+              - desc
+            type: string
+      responses:
+        "200":
+          description: ""
+      summary: Liste des cours
+      tags: &a4
+        - Courses
+    post:
+      operationId: CoursesController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCourseDto"
+      responses:
+        "201":
+          description: ""
+      security:
+        - bearer: []
+      tags: *a4
+  /api/v1/courses/{id}:
+    get:
+      operationId: CoursesController_findOne
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      summary: Détail cours + formateur + nb inscriptions
+      tags: *a4
+    put:
+      operationId: CoursesController_update
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCourseDto"
+      responses:
+        "200":
+          description: ""
+      security:
+        - bearer: []
+      tags: *a4
+    delete:
+      operationId: CoursesController_remove
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "204":
+          description: ""
+      security:
+        - bearer: []
+      tags: *a4
+  /api/v1/courses/{id}/generate-description:
+    post:
+      operationId: CoursesController_generateDescription
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "201":
+          description: ""
+      security:
+        - bearer: []
+      tags: *a4
+  /api/v1/courses/{id}/description:
+    get:
+      operationId: CoursesController_getDescription
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      tags: *a4
+  /api/v1/enrollments:
+    get:
+      operationId: EnrollmentsController_findAll
+      parameters:
+        - name: status
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: payment_status
+          required: false
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      security: &a5
+        - bearer: []
+      tags: &a6
+        - Enrollments
+    post:
+      operationId: EnrollmentsController_create
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEnrollmentDto"
+      responses:
+        "201":
+          description: ""
+        "409":
+          description: Déjà inscrit
+      security: *a5
+      tags: *a6
+  /api/v1/enrollments/{id}/complete:
+    patch:
+      operationId: EnrollmentsController_complete
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      security: *a5
+      tags: *a6
+  /api/v1/webhooks/payment:
+    post:
+      operationId: WebhooksController_handlePaymentWebhook
+      parameters:
+        - name: x-webhook-signature
+          required: true
+          in: header
+          schema:
+            type: string
+      responses:
+        "200":
+          description: ""
+      summary: Webhook de paiement
+      tags:
+        - Webhooks
+info:
+  title: API École de Formation
+  description: Gestion des étudiants, formateurs, cours et inscriptions
+  version: "1.0"
+  contact: {}
+tags: []
+servers: []
+components:
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: JWT
+      type: http
+  schemas:
+    LoginDto:
+      type: object
+      properties: {}
+    CreateStudentDto:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+      required:
+        - name
+        - email
+    UpdateStudentDto:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        phone:
+          type: string
+    CreateInstructorDto:
+      type: object
+      properties:
+        name:
+          type: string
+        email:
+          type: string
+        specialty:
+          type: string
+      required:
+        - name
+        - email
+        - specialty
+    CreateCourseDto:
+      type: object
+      properties:
+        title:
+          type: string
+        price:
+          type: number
+        duration_hours:
+          type: number
+        instructor_id:
+          type: string
+      required:
+        - title
+        - price
+        - duration_hours
+        - instructor_id
+    UpdateCourseDto:
+      type: object
+      properties:
+        title:
+          type: string
+        price:
+          type: number
+        duration_hours:
+          type: number
+        instructor_id:
+          type: string
+    CreateEnrollmentDto:
+      type: object
+      properties:
+        student_id:
+          type: string
+        course_id:
+          type: string
+      required:
+        - student_id
+        - course_id
