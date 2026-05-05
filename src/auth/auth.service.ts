@@ -2,7 +2,10 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 
-const FAKE_USER = { email: 'admin@ecole.com', password: 'password123' };
+const FAKE_USER = {
+  email: 'admin@ecole.com',
+  password: 'password123',
+};
 
 @Injectable()
 export class AuthService {
