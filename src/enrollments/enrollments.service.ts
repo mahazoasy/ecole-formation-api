@@ -30,24 +30,40 @@ export class EnrollmentsService {
   }
 
   async findOne(id: string): Promise<Enrollment> {
+    // Vérifier si l'ID est valide
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('ID invalide');
+    }
     const enrollment = await this.enrollmentModel.findById(id).exec();
     if (!enrollment) throw new NotFoundException('Inscription non trouvée');
     return enrollment;
   }
 
   async complete(id: string): Promise<Enrollment> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('ID invalide');
+    }
     const enrollment = await this.enrollmentModel.findById(id);
     if (!enrollment) throw new NotFoundException('Inscription non trouvée');
-    if (enrollment.status !== 'active') throw new BadRequestException('Seule une inscription active peut être marquée comme terminée');
+    if (enrollment.status !== 'active') {
+      throw new BadRequestException('Seule une inscription active peut être marquée comme terminée');
+    }
     enrollment.status = 'completed';
     return enrollment.save();
   }
 
-  async updatePaymentStatus(id: string, payment_status: string, status?: string): Promise<Enrollment> {
+  async updatePaymentStatus(id: string, payment_status: string, newStatus?: string): Promise<Enrollment> {
+    if (!Types.ObjectId.isValid(id)) {
+      throw new BadRequestException('ID invalide');
+    }
     const enrollment = await this.enrollmentModel.findById(id);
-    if (!enrollment) throw new NotFoundException('Inscription non trouvée');
+    if (!enrollment) {
+      throw new NotFoundException('Inscription non trouvée');
+    }
     enrollment.payment_status = payment_status;
-    if (status) enrollment.status = status;
+    if (newStatus) {
+      enrollment.status = newStatus;
+    }
     return enrollment.save();
   }
 }

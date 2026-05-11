@@ -312,7 +312,7 @@ paths:
           schema:
             type: string
       responses:
-        "200":
+        "201":
           description: ""
       summary: Webhook de paiement
       tags:
