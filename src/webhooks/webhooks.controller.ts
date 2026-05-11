@@ -17,7 +17,14 @@ export class WebhooksController {
     @Headers('x-webhook-signature') signature: string,
     @RawBody() rawBody: Buffer,
   ) {
-    // Cas 1 : signature manquante → 401
+    // Vérifier que le body n'est pas vide
+    if (!rawBody || rawBody.length === 0) {
+      throw new HttpException(
+        { success: false, message: 'Body requis' },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
     if (!signature) {
       throw new HttpException(
         { success: false, message: 'Signature invalide' },
@@ -29,7 +36,6 @@ export class WebhooksController {
     const crypto = require('crypto');
     const expectedSignature = 'sha256=' + crypto.createHmac('sha256', secret).update(rawBody).digest('hex');
     
-    // Cas 2 : signature incorrecte → 401
     if (signature !== expectedSignature) {
       throw new HttpException(
         { success: false, message: 'Signature invalide' },
@@ -37,13 +43,11 @@ export class WebhooksController {
       );
     }
 
-    // Cas 3 : signature valide – traiter l'événement
     const payload = JSON.parse(rawBody.toString());
     if (payload.event === 'payment.succeeded') {
       const enrollmentId = payload.data.enrollment_id;
       try {
         const updated = await this.enrollmentsService.updatePaymentStatus(enrollmentId, 'paid', 'active');
-        console.log('Enrollment mis à jour avec succès, ID:', (updated as any)._id);
         return { success: true, received: true };
       } catch (error) {
         throw new HttpException(
@@ -53,7 +57,6 @@ export class WebhooksController {
       }
     }
     
-    // Cas 4 : événement non supporté
     throw new HttpException(
       { success: false, message: 'Événement non supporté' },
       HttpStatus.BAD_REQUEST,
